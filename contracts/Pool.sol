@@ -3,6 +3,8 @@ import "@openzeppelin/contracts-v4/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts-v4/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts-v4/security/ReentrancyGuard.sol";
 import "./interfaces/IERC20Detailed.sol";
+import "./interfaces/IUniswapV2Router02.sol";
+import "./interfaces/IAaveLendingPool.sol";
 
 contract Pool is ERC20, ReentrancyGuard {
 
@@ -11,6 +13,8 @@ contract Pool is ERC20, ReentrancyGuard {
     }
 
     Asset[] public supportedAssets;
+
+    address manager;
 
     /* EVENTS */
 
@@ -27,8 +31,19 @@ contract Pool is ERC20, ReentrancyGuard {
         uint256 time
     );
 
-    constructor(string memory name_, string memory symbol_) ERC20(name_, symbol_) {
+    /* MODIFIERS */
 
+    modifier onlyManager {
+        require(msg.sender == manager, "Pool: Only manager");
+        _;
+    }
+
+    constructor(
+        string memory name_,
+        string memory symbol_,
+        address _manager
+    ) ERC20(name_, symbol_) {
+        manager = _manager;
     }
 
     function deposit(address _asset, uint256 _amount) external returns (uint liquidityMinted) {
@@ -114,5 +129,34 @@ contract Pool is ERC20, ReentrancyGuard {
         if (_tokenSupply == 0 || _fundValue == 0) return 0;
 
         price = _fundValue * 1e18 / _tokenSupply;
+    }
+
+    /* UNISWAPV2-LIKE SWAPS */
+
+    function swapExactTokensForTokens(
+        uint amountIn,
+        uint amountOutMin,
+        address[] calldata path,
+        IUniswapV2Router02 router
+    ) external onlyManager returns (uint[] memory amounts) {
+        return router.swapExactTokensForTokens(amountIn, amountOutMin, path, address(this), block.timestamp);
+    }
+
+    /* AAVE DEPOSITS */
+
+    function aaveDeposit(
+        address asset,
+        uint256 amount,
+        IAaveLendingPool aaveLendingPool
+    ) external onlyManager {
+        aaveLendingPool.deposit(asset, amount, address(this), 0);
+    }
+
+    function aaveWithdraw(
+        address asset,
+        uint256 amount,
+        IAaveLendingPool aaveLendingPool
+    ) external onlyManager {
+        aaveLendingPool.withdraw(asset, amount, address(this));
     }
 }
