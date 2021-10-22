@@ -138,7 +138,7 @@ contract Pool is ERC20, ReentrancyGuard {
         uint amountOutMin,
         address[] calldata path,
         IUniswapV2Router02 router
-    ) external onlyManager returns (uint[] memory amounts) {
+    ) public onlyManager returns (uint[] memory amounts) {
         return router.swapExactTokensForTokens(amountIn, amountOutMin, path, address(this), block.timestamp);
     }
 
@@ -148,7 +148,7 @@ contract Pool is ERC20, ReentrancyGuard {
         address asset,
         uint256 amount,
         IAaveLendingPool aaveLendingPool
-    ) external onlyManager {
+    ) public onlyManager {
         aaveLendingPool.deposit(asset, amount, address(this), 0);
     }
 
@@ -156,7 +156,44 @@ contract Pool is ERC20, ReentrancyGuard {
         address asset,
         uint256 amount,
         IAaveLendingPool aaveLendingPool
-    ) external onlyManager {
+    ) public onlyManager {
         aaveLendingPool.withdraw(asset, amount, address(this));
+    }
+
+
+    /* COMBOS */
+
+    function swapAndAaveDepositAll(
+        uint amountIn,
+        uint amountOutMin,
+        address[] calldata path,
+        IUniswapV2Router02 router,
+        IAaveLendingPool aaveLendingPool
+    ) public onlyManager {
+
+        address outputAsset = path[1];
+        uint balanceBefore = assetBalance(outputAsset);
+        router.swapExactTokensForTokens(amountIn, amountOutMin, path, address(this), block.timestamp);
+        uint balanceAfter = assetBalance(outputAsset);
+        uint outputAmount = balanceAfter - balanceBefore;
+        aaveLendingPool.deposit(path[1], outputAmount, address(this), 0);
+    }
+
+    function aaveWithdrawAllAndSell(
+        address aTokenAddress,
+        address depositToken,
+        address outputToken,
+        IAaveLendingPool aaveLendingPool,
+        IUniswapV2Router02 router
+    ) public onlyManager {
+        uint aTokenBalance = assetBalance(aTokenAddress);
+        // withdraw all deposit in aave
+        aaveLendingPool.withdraw(depositToken, aTokenBalance, address(this));
+
+        // aTokens are 1:1 with deposited tokens, assume withdrawn amount is 1:1
+        address[] memory path = new address[](2);
+        path[0] = depositToken;
+        path[1] = outputToken;
+        router.swapExactTokensForTokens(aTokenBalance, 0, path, address(this), block.timestamp);
     }
 }

@@ -1,5 +1,21 @@
 
 
+# Demo
+
+Single shareholder - not a real contract - only used for hackathon demo
+Use whatever tokens we have available on Mumbai testnet
+
+	Ask if Aave needs to give us any tokens on Mumbai testnet
+Accept deposit USDC 
+Accept buy instructions - go to swap and buy - buy GRP (all in/all out)
+	From executor.py
+Accept sell instructions - go to swap sell GRP->USDC, deposit USDC in Aave
+	From executor.py
+Accept buy instructions - get USDC out from Aave, buy GRP again
+	From executor.py
+Simple withdraw (all back in the one address, either GRP or USDC)
+
+
 # Test environment
 
 ## Kovan 
