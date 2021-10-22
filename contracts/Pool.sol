@@ -5,6 +5,7 @@ import "@openzeppelin/contracts-v4/security/ReentrancyGuard.sol";
 import "./interfaces/IERC20Detailed.sol";
 import "./interfaces/IUniswapV2Router02.sol";
 import "./interfaces/IAaveLendingPool.sol";
+import "./interfaces/AggregatorV3Interface.sol";
 
 contract Pool is ERC20, ReentrancyGuard {
 
@@ -13,6 +14,7 @@ contract Pool is ERC20, ReentrancyGuard {
     }
 
     Asset[] public supportedAssets;
+    mapping(address => address) public priceOracles;
 
     address manager;
 
@@ -41,9 +43,16 @@ contract Pool is ERC20, ReentrancyGuard {
     constructor(
         string memory name_,
         string memory symbol_,
-        address _manager
+        address _manager,
+        address[] memory _supportedAssets,
+        address[] memory _priceOracles
     ) ERC20(name_, symbol_) {
         manager = _manager;
+
+        for (uint i = 0; i  < _supportedAssets.length; i++) {
+            supportedAssets.push(Asset(_supportedAssets[i]));
+            priceOracles[_supportedAssets[i]] = _priceOracles[i];
+        }
     }
 
     function deposit(address _asset, uint256 _amount) external returns (uint liquidityMinted) {
@@ -107,7 +116,18 @@ contract Pool is ERC20, ReentrancyGuard {
     }
 
     function getAssetPrice(address asset) public view returns (uint256 price) {
-        // TODO: implement
+        AggregatorV3Interface aggregator = AggregatorV3Interface(priceOracles[asset]);
+
+        // skipping checks for staleness
+        (
+            /* uint80 roundId */,
+            int256 answer,
+            /* uint256 startedAt */,
+            /* uint256 updatedAt */,
+            /* uint80 answeredInRound */
+        ) = aggregator.latestRoundData();
+
+        return uint256(answer);
     }
 
     function assetDecimal(address asset) public view returns (uint256 price) {
