@@ -38,18 +38,18 @@ async function main() {
   })
 
 
-  const lendingPool = await IAaveLendingPool.at(Addresses.AAVE_LENDING_POOL)
+  const router = await IAaveLendingPool.at(Addresses.ONE_INCH_ROUTER)
 
   const fromToken = await IERC20Detailed.at(fromTokenAddress)
 
   console.log('approve...')
-  await fromToken.approve(lendingPool.address, ether('1000000000'))
+  await fromToken.approve(router.address, ether('1000000000'))
 
   console.log('swap...')
 
 
   await web3.eth.call({
-    to: lendingPool.address,
+    to: router.address,
     data: data
   })
 
