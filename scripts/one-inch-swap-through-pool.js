@@ -37,17 +37,9 @@ async function main() {
     data
   })
 
-
-  // const router = await IAaveLendingPool.at(Addresses.ONE_INCH_ROUTER)
-  //
-  // const fromToken = await IERC20Detailed.at(fromTokenAddress)
-
-
   const pool = await Pool.at(contracts.pool);
   console.log('swap...')
   await pool.swapTokensOn1Inch(data, '0', Addresses.ONE_INCH_ROUTER)
-
-  //   await lendingPool.call(data)
 }
 
 

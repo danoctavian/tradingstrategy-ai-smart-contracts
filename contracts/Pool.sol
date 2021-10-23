@@ -231,9 +231,14 @@ contract Pool is ERC20, ReentrancyGuard {
 
         address outputAsset = path[1];
         uint balanceBefore = assetBalance(outputAsset);
+
+        IERC20Detailed(path[0]).approve(address(router), amountIn);
         router.swapExactTokensForTokens(amountIn, amountOutMin, path, address(this), block.timestamp);
+
         uint balanceAfter = assetBalance(outputAsset);
         uint outputAmount = balanceAfter - balanceBefore;
+
+        IERC20Detailed(path[1]).approve(address(aaveLendingPool), outputAmount);
         aaveLendingPool.deposit(path[1], outputAmount, address(this), 0);
     }
 
@@ -252,6 +257,7 @@ contract Pool is ERC20, ReentrancyGuard {
         address[] memory path = new address[](2);
         path[0] = depositToken;
         path[1] = outputToken;
+        IERC20Detailed(path[0]).approve(address(router), aTokenBalance);
         router.swapExactTokensForTokens(aTokenBalance, 0, path, address(this), block.timestamp);
     }
 }
