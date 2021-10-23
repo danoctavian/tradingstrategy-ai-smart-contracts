@@ -23,13 +23,15 @@ async function main () {
 
   const pool = await Pool.at(contracts.pool)
 
-  console.log('swapping...')
-  await pool.swapExactTokensForTokens(
+  console.log('swapping and depositing all...')
+
+  await pool.swapAndAaveDepositAll(
     '1000',
     '0',
     [Addresses.USDC, Addresses.DAI],
-    Addresses.QUICKSWAP
-  )
+    Addresses.QUICKSWAP,
+    Addresses.AAVE_LENDING_POOL
+  );
 
   process.exit(0)
 

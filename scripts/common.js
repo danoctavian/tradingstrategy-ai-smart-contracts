@@ -5,6 +5,8 @@ const Addresses = {
   USDC: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
   DAI: '0x8f3cf7ad23cd3cadbd9735aff958023239c6a063',
   WMATIC: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
+  amDAI: '0x27f8d03b3a2196956ed754badc28d73be8830a6e',
+  amUSDC: '0x1a13f4ca1d028320a707d99520abfefca3998b7f',
   AAVE_LENDING_POOL: '0x8dff5e27ea6b7ac08ebfdf9eb090f32ee9a30fcf',
   ONE_INCH_ROUTER: '0x11111112542d85b3ef69ae05771c2dccff4faa26',
 
