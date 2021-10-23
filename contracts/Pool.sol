@@ -57,6 +57,8 @@ contract Pool is ERC20, ReentrancyGuard {
 
     function deposit(address _asset, uint256 _amount) external returns (uint liquidityMinted) {
 
+        require(priceOracles[_asset] != address(0), "Asset not supported");
+
         uint256 fundValue = totalFundValue();
 
         uint256 totalSupplyBefore = totalSupply();
@@ -159,6 +161,8 @@ contract Pool is ERC20, ReentrancyGuard {
         address[] calldata path,
         IUniswapV2Router02 router
     ) public onlyManager returns (uint[] memory amounts) {
+
+        IERC20Detailed(path[0]).approve(address(router), amountIn);
         return router.swapExactTokensForTokens(amountIn, amountOutMin, path, address(this), block.timestamp);
     }
 
@@ -179,14 +183,13 @@ contract Pool is ERC20, ReentrancyGuard {
     function swapTokensOn1Inch(
         bytes calldata data,
         uint minOut,
-        address fromTokenAddress,
         address aggregationRouterV3
     ) public onlyManager {
 
         (/* address _c */, OneInchSwapDescription memory desc, /* bytes memory _d */)
             = abi.decode(data[4:], (address, OneInchSwapDescription, bytes));
 
-        IERC20Detailed(fromTokenAddress).approve(aggregationRouterV3, desc.amount);
+        desc.srcToken.approve(aggregationRouterV3, desc.amount);
         (bool succ, bytes memory _data) = address(aggregationRouterV3).call(data);
         if (succ) {
             (uint returnAmount, uint gasLeft) = abi.decode(_data, (uint, uint));
