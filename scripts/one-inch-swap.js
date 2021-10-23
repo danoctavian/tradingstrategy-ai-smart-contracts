@@ -20,7 +20,7 @@ async function main() {
   const sender = Addresses.MANAGER // contracts.pool
   const slippage = 50; // not sure
 
-  const fromTokenAddress = Addresses.WMATIC
+  const fromTokenAddress = Addresses.DAI
   const toTokenAddress = Addresses.USDC
   const oneInchBuilderURL =
     `https://api.1inch.exchange/v3.0/${chainId}/swap?fromTokenAddress=${fromTokenAddress}&toTokenAddress=${toTokenAddress}&` +
