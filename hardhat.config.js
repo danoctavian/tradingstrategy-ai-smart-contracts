@@ -47,10 +47,6 @@ for (const network of ['POLYGON', 'KOVAN', 'MUMBAI']) {
 
 const apiKey = process.env.ETHERSCAN_API_KEY
 
-console.log({
-  apiKey
-})
-
 module.exports = {
   networks,
 
@@ -62,7 +58,7 @@ module.exports = {
   },
 
   etherscan: {
-    apiKey
+    apiKey: apiKey
   },
 
 };

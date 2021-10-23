@@ -16,8 +16,6 @@ async function main () {
   console.log(`Using network: ${network.name}`)
   console.log('Network config:', config.networks[network.name])
 
-  console.log('doing swaps..')
-
   const contracts = JSON.parse(fs.readFileSync('deployment.json', 'utf8'))
 
   console.log({

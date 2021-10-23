@@ -4,16 +4,23 @@ const name = 'TradingStrategyShares'
 const symbol = 'TSS'
 const manager = '0x8Ac7C3077610707Cd7dAa8EA986D7da9600DF580'
 
-// TODO: fill
-const supportedAssets = [Addresses.USDC, Addresses.WMATIC]
+const supportedAssets = [Addresses.USDC, Addresses.WMATIC, Addresses.DAI, Addresses.amUSDC, Addresses.amDAI]
 
-// TODO: fill
-const priceOracles = [Addresses.CHAINLINK.USDC_USD, Addresses.CHAINLINK.MATIC_USD]
+const priceOracles = [
+  Addresses.CHAINLINK.USDC_USD,
+  Addresses.CHAINLINK.MATIC_USD,
+  Addresses.CHAINLINK.DAI_USD,
+  Addresses.CHAINLINK.USDC_USD, // assume peg to USDC
+  Addresses.CHAINLINK.DAI_USD, // assume peg to DAI
+]
+
+const shareholder = manager
 
 module.exports = [
   name,
   symbol,
   manager,
   supportedAssets,
-  priceOracles
+  priceOracles,
+  shareholder
 ];
