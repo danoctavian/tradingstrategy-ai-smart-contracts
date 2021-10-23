@@ -44,6 +44,13 @@ for (const network of ['POLYGON', 'KOVAN', 'MUMBAI']) {
   networks[network.toLowerCase()] = { accounts, gasPrice, gasLimit, url };
 }
 
+
+const apiKey = process.env.ETHERSCAN_API_KEY
+
+console.log({
+  apiKey
+})
+
 module.exports = {
   networks,
 
@@ -53,4 +60,9 @@ module.exports = {
       {  version: '0.8.7' },
     ]
   },
+
+  etherscan: {
+    apiKey
+  },
+
 };
