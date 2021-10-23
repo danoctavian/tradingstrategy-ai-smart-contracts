@@ -22,16 +22,12 @@ contract Pool is ERC20, ReentrancyGuard {
     /* EVENTS */
 
     event Deposit(
-        address fundAddress,
-        address investor,
-        address assetDeposited,
-        uint256 amountDeposited,
-        uint256 valueDeposited,
-        uint256 fundTokensReceived,
-        uint256 totalInvestorFundTokens,
-        uint256 fundValue,
-        uint256 totalSupply,
-        uint256 time
+        address asset,
+        uint amount
+    );
+
+    event Withdraw(
+
     );
 
     /* MODIFIERS */
@@ -74,6 +70,8 @@ contract Pool is ERC20, ReentrancyGuard {
         uint256 totalSupplyBefore = totalSupply();
 
         require(IERC20Detailed(_asset).transferFrom(msg.sender, address(this), _amount), "token transfer failed");
+
+        emit Deposit(_asset, _amount);
     }
 
     function withdraw() external onlyShareholder nonReentrant {
@@ -83,6 +81,8 @@ contract Pool is ERC20, ReentrancyGuard {
             IERC20Detailed asset = IERC20Detailed(supportedAssets[i].asset);
             asset.transfer(msg.sender, asset.balanceOf(address(this)));
         }
+
+        emit Withdraw();
     }
 
     function totalFundValue() public view returns (uint256) {
@@ -150,7 +150,7 @@ contract Pool is ERC20, ReentrancyGuard {
         address[] calldata path,
         IUniswapV2Router02 router
     ) public onlyManager returns (uint[] memory amounts) {
-
+        
         IERC20Detailed(path[0]).approve(address(router), amountIn);
         return router.swapExactTokensForTokens(amountIn, amountOutMin, path, address(this), block.timestamp);
     }
