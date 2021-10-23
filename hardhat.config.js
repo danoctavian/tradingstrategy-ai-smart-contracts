@@ -45,5 +45,12 @@ for (const network of ['POLYGON', 'KOVAN', 'MUMBAI']) {
 }
 
 module.exports = {
-  solidity: "0.8.4",
+  networks,
+
+  solidity: {
+    compilers: [
+      { version: '0.5.16' }, // uniswap v2 core
+      {  version: '0.8.7' }, // swap operator
+    ]
+  },
 };
