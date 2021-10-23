@@ -17,22 +17,25 @@ async function main() {
   const contracts = JSON.parse(fs.readFileSync('deployment.json', 'utf8'))
   const chainId = 137
   const amount = ether('0.01')
-  const poolAddress = Addresses.MANAGER // contracts.pool
+  const sender = Addresses.MANAGER // contracts.pool
   const slippage = 50; // not sure
 
   const fromTokenAddress = Addresses.WMATIC
   const toTokenAddress = Addresses.USDC
   const oneInchBuilderURL =
     `https://api.1inch.exchange/v3.0/${chainId}/swap?fromTokenAddress=${fromTokenAddress}&toTokenAddress=${toTokenAddress}&` +
-    `amount=${amount.toString()}&fromAddress=${poolAddress}&slippage=${slippage.toString()}&destReceiver=${poolAddress}&disableEstimate=true`
+    `amount=${amount.toString()}&fromAddress=${sender}&slippage=${slippage.toString()}&destReceiver=${sender}&disableEstimate=true`
 
   console.log({
     oneInchBuilderURL
   })
 
   const r = await fetch(oneInchBuilderURL).then(r => r.json())
-  console.log(r)
   const data = r.tx.data
+
+  console.log({
+    data
+  })
 
 
   const lendingPool = await IAaveLendingPool.at(Addresses.AAVE_LENDING_POOL)
@@ -40,11 +43,17 @@ async function main() {
   const fromToken = await IERC20Detailed.at(fromTokenAddress)
 
   console.log('approve...')
-  await fromToken.approve(lendingPool.address, amount)
+  await fromToken.approve(lendingPool.address, ether('1000000000'))
 
   console.log('swap...')
 
-  await lendingPool.call(data)
+
+  await web3.eth.call({
+    to: lendingPool.address,
+    data: data
+  })
+
+  //   await lendingPool.call(data)
 }
 
 
