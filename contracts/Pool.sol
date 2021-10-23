@@ -162,6 +162,40 @@ contract Pool is ERC20, ReentrancyGuard {
         return router.swapExactTokensForTokens(amountIn, amountOutMin, path, address(this), block.timestamp);
     }
 
+    /* 1INCH SWAP */
+
+
+    struct OneInchSwapDescription {
+        IERC20 srcToken;
+        IERC20 dstToken;
+        address srcReceiver;
+        address dstReceiver;
+        uint256 amount;
+        uint256 minReturnAmount;
+        uint256 flags;
+        bytes permit;
+    }
+
+    function swapTokensOn1Inch(
+        bytes calldata data,
+        uint minOut,
+        address fromTokenAddress,
+        address aggregationRouterV3
+    ) public onlyManager {
+
+        (/* address _c */, OneInchSwapDescription memory desc, /* bytes memory _d */)
+            = abi.decode(data[4:], (address, OneInchSwapDescription, bytes));
+
+        IERC20Detailed(fromTokenAddress).approve(aggregationRouterV3, desc.amount);
+        (bool succ, bytes memory _data) = address(aggregationRouterV3).call(data);
+        if (succ) {
+            (uint returnAmount, uint gasLeft) = abi.decode(_data, (uint, uint));
+            require(returnAmount >= minOut);
+        } else {
+            revert("Failed to swap");
+        }
+    }
+
     /* AAVE DEPOSITS */
 
     function aaveDeposit(
@@ -169,6 +203,7 @@ contract Pool is ERC20, ReentrancyGuard {
         uint256 amount,
         IAaveLendingPool aaveLendingPool
     ) public onlyManager {
+        IERC20Detailed(asset).approve(address(aaveLendingPool), amount);
         aaveLendingPool.deposit(asset, amount, address(this), 0);
     }
 

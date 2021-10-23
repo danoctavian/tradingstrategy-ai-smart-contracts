@@ -6,7 +6,8 @@
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test test/index.js",
-    "deploy": "hardhat run --network polygon deploy/deploy.js"
+    "deploy": "hardhat run --network polygon scripts/deploy.js",
+    "run-swaps": "hardhat run --network polygon scripts/run-swaps.js"
   },
   "repository": {
     "type": "git",
