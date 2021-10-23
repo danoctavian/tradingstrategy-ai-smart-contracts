@@ -19,24 +19,31 @@ async function main () {
   const symbol = 'TSS'
   const manager = '0x8Ac7C3077610707Cd7dAa8EA986D7da9600DF580'
 
-  // TODO: fill
-  const supportedAssets = [Addresses.USDC, Addresses.WMATIC]
+  const supportedAssets = [Addresses.USDC, Addresses.WMATIC, Addresses.DAI, Addresses.amUSDC, Addresses.amDAI]
 
-  // TODO: fill
-  const priceOracles = [Addresses.CHAINLINK.USDC_USD, Addresses.CHAINLINK.MATIC_USD]
+  const priceOracles = [
+    Addresses.CHAINLINK.USDC_USD,
+    Addresses.CHAINLINK.MATIC_USD,
+    Addresses.CHAINLINK.DAI_USD,
+    Addresses.CHAINLINK.USDC_USD, // assume peg to USDC
+    Addresses.CHAINLINK.DAI_USD, // assume peg to DAI
+  ]
 
   const managerBalance = await web3.eth.getBalance(manager);
   console.log({
     managerBalance: managerBalance.toString()
   });
 
+  // manager is also shareholder for simplicity
+  const shareholder = manager
 
   const pool = await Pool.new(
     name,
     symbol,
     manager,
     supportedAssets,
-    priceOracles
+    priceOracles,
+    shareholder
   );
 
   const contracts = {

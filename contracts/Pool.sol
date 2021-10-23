@@ -17,6 +17,7 @@ contract Pool is ERC20, ReentrancyGuard {
     mapping(address => address) public priceOracles;
 
     address manager;
+    address shareholder;
 
     /* EVENTS */
 
@@ -40,14 +41,23 @@ contract Pool is ERC20, ReentrancyGuard {
         _;
     }
 
+
+    modifier onlyShareholder {
+        require(msg.sender == shareholder, "Pool: Only shareholder");
+        _;
+    }
+
+
     constructor(
         string memory name_,
         string memory symbol_,
         address _manager,
         address[] memory _supportedAssets,
-        address[] memory _priceOracles
+        address[] memory _priceOracles,
+        address _shareholder
     ) ERC20(name_, symbol_) {
         manager = _manager;
+        shareholder = _shareholder;
 
         for (uint i = 0; i  < _supportedAssets.length; i++) {
             supportedAssets.push(Asset(_supportedAssets[i]));
@@ -55,7 +65,7 @@ contract Pool is ERC20, ReentrancyGuard {
         }
     }
 
-    function deposit(address _asset, uint256 _amount) external returns (uint liquidityMinted) {
+    function deposit(address _asset, uint256 _amount) external onlyShareholder {
 
         require(priceOracles[_asset] != address(0), "Asset not supported");
 
@@ -64,36 +74,15 @@ contract Pool is ERC20, ReentrancyGuard {
         uint256 totalSupplyBefore = totalSupply();
 
         require(IERC20Detailed(_asset).transferFrom(msg.sender, address(this), _amount), "token transfer failed");
-
-        uint256 usdAmount = assetValue(_asset, _amount);
-
-        if (totalSupplyBefore > 0) {
-            liquidityMinted = usdAmount * totalSupplyBefore / fundValue;
-        } else {
-            liquidityMinted = usdAmount;
-        }
-
-
-        _mint(msg.sender, liquidityMinted);
-
-        emit Deposit(
-            address(this),
-            msg.sender,
-            _asset,
-            _amount,
-            usdAmount,
-            liquidityMinted,
-            balanceOf(msg.sender),
-            fundValue + usdAmount,
-            totalSupplyBefore + liquidityMinted,
-            block.timestamp
-        );
     }
 
-    function withdraw(uint256 _fundTokenAmount) external virtual nonReentrant {
-        require(balanceOf(msg.sender) >= _fundTokenAmount, "insufficient balance");
+    function withdraw() external onlyShareholder nonReentrant {
 
-        // TODO: implement
+        // move all assets to shareholder
+        for (uint i = 0; i < supportedAssets.length; i++) {
+            IERC20Detailed asset = IERC20Detailed(supportedAssets[i].asset);
+            asset.transfer(msg.sender, asset.balanceOf(address(this)));
+        }
     }
 
     function totalFundValue() public view returns (uint256) {
