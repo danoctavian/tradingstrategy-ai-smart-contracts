@@ -37,5 +37,5 @@ async function main () {
 
 main().catch(error => {
   console.error('An unexpected error encountered:', error)
-  process.exit(1)j
+  process.exit(1)
 });

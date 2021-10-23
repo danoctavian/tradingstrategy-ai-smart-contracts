@@ -2,6 +2,17 @@
  * @type import('hardhat/config').HardhatUserConfig
  */
 
+require('dotenv').config();
+require('@nomiclabs/hardhat-web3');
+require('@nomiclabs/hardhat-truffle5');
+require('@nomiclabs/hardhat-etherscan');
+require('@nomiclabs/hardhat-waffle');
+require('solidity-coverage');
+require('hardhat-contract-sizer');
+
+const { task } = require('hardhat/config');
+const ether = n => `${n}${'0'.repeat(18)}`;
+
 const networks = {
   hardhat: {
     accounts: {
@@ -24,7 +35,7 @@ const getenv = (network, key, fallback, parser = i => i) => {
   return value ? parser(value) : fallback;
 };
 
-for (const network of ['MAINNET', 'KOVAN', 'MUMBAI']) {
+for (const network of ['POLYGON', 'KOVAN', 'MUMBAI']) {
   const url = getenv(network, 'PROVIDER_URL', false);
   if (!url) continue;
   const accounts = getenv(network, 'ACCOUNT_KEY', undefined, v => v.split(/[^0-9a-fx]+/i));
