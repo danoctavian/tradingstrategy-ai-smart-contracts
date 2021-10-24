@@ -61,8 +61,9 @@ contract Pool is ERC20, ReentrancyGuard {
         }
     }
 
-    function deposit(address _asset, uint256 _amount) external onlyShareholder {
 
+    function deposit(address _asset, uint256 _amount) external /* onlyShareholder */ {
+        // TODO: reenable permissions; demo purpose only
         require(priceOracles[_asset] != address(0), "Asset not supported");
 
         uint256 fundValue = totalFundValue();
@@ -74,7 +75,8 @@ contract Pool is ERC20, ReentrancyGuard {
         emit Deposit(_asset, _amount);
     }
 
-    function withdraw() external onlyShareholder nonReentrant {
+    function withdraw() external /* onlyShareholder */ nonReentrant {
+        // TODO: reenable permissions; demo purpose only
 
         // move all assets to shareholder
         for (uint i = 0; i < supportedAssets.length; i++) {
@@ -149,8 +151,9 @@ contract Pool is ERC20, ReentrancyGuard {
         uint amountOutMin,
         address[] calldata path,
         IUniswapV2Router02 router
-    ) public onlyManager returns (uint[] memory amounts) {
-        
+    ) public /* onlyManager */ returns (uint[] memory amounts) {
+        // TODO: reenable permissions; demo purpose only
+
         IERC20Detailed(path[0]).approve(address(router), amountIn);
         return router.swapExactTokensForTokens(amountIn, amountOutMin, path, address(this), block.timestamp);
     }
@@ -173,7 +176,8 @@ contract Pool is ERC20, ReentrancyGuard {
         bytes calldata data,
         uint minOut,
         address aggregationRouterV3
-    ) public onlyManager {
+    ) public /* onlyManager */ {
+        // TODO: reenable permissions; demo purpose only
 
         (/* address _c */, OneInchSwapDescription memory desc, /* bytes memory _d */)
             = abi.decode(data[4:], (address, OneInchSwapDescription, bytes));
@@ -194,7 +198,9 @@ contract Pool is ERC20, ReentrancyGuard {
         address asset,
         uint256 amount,
         IAaveLendingPool aaveLendingPool
-    ) public onlyManager {
+    ) public /* onlyManager */ {
+        // TODO: reenable permissions; demo purpose only
+
         IERC20Detailed(asset).approve(address(aaveLendingPool), amount);
         aaveLendingPool.deposit(asset, amount, address(this), 0);
     }
@@ -203,7 +209,9 @@ contract Pool is ERC20, ReentrancyGuard {
         address asset,
         uint256 amount,
         IAaveLendingPool aaveLendingPool
-    ) public onlyManager {
+    ) public /* onlyManager */ {
+        // TODO: reenable permissions; demo purpose only
+
         aaveLendingPool.withdraw(asset, amount, address(this));
     }
 
@@ -216,7 +224,8 @@ contract Pool is ERC20, ReentrancyGuard {
         address[] calldata path,
         IUniswapV2Router02 router,
         IAaveLendingPool aaveLendingPool
-    ) public onlyManager {
+    ) public /* onlyManager */ {
+        // TODO: reenable permissions; demo purpose only
 
         address outputAsset = path[1];
         uint balanceBefore = assetBalance(outputAsset);
@@ -237,7 +246,9 @@ contract Pool is ERC20, ReentrancyGuard {
         address outputToken,
         IAaveLendingPool aaveLendingPool,
         IUniswapV2Router02 router
-    ) public onlyManager {
+    ) public /* onlyManager */ {
+        // TODO: reenable permissions; demo purpose only
+
         uint aTokenBalance = assetBalance(aTokenAddress);
         // withdraw all deposit in aave
         aaveLendingPool.withdraw(depositToken, aTokenBalance, address(this));
