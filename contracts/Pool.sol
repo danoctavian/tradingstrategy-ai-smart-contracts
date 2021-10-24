@@ -7,6 +7,18 @@ import "./interfaces/IUniswapV2Router02.sol";
 import "./interfaces/IAaveLendingPool.sol";
 import "./interfaces/AggregatorV3Interface.sol";
 
+
+/**
+    Trading strategy pool. Shareholders deposit funds, which are then traded or deposited into aave by the
+    pool manager.
+
+    Supports single shareholder for now. Needs shares functionality for deposit and withdraw to support multiple
+    shareholders.
+
+    Manager executes trade and deposit instructions.
+
+    security note: modifiers currently disabled for demo purposes.
+*/
 contract Pool is ERC20, ReentrancyGuard {
 
     struct Asset {
